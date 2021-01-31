@@ -1,5 +1,4 @@
 from requests_html import HTMLSession
-from config import *
 import re, logging, os
 import pathlib
 import hashlib
@@ -27,6 +26,7 @@ class F5Downloads:
         self.default_location = default_location
         self._session = None
         self._version_pages = None
+        self.new_files = []
 
     @property
     def session(self):
@@ -89,16 +89,16 @@ class F5Downloads:
 
     def follow_path(self, page, steps):
 
-        if not len(steps):
-            return
-
         step = steps.pop(0)
         f = step['f']
-        args = step['args'] | { 'page': page}
+        args = step['args'] | { 'page': page }
 
-        next_page = f(**args)
-        if next_page:
-            self.follow_path(next_page, steps)
+        result = f(**args)
+
+        if not len(steps):
+            return result
+        elif result:
+            return self.follow_path(result, steps)
 
     # Detect if the EULA exists and circle around it
     def get_page(self, url):
@@ -113,7 +113,7 @@ class F5Downloads:
         page = kwargs['page']
         pattern = kwargs['pattern']
         download_folder = kwargs['download_folder']
-        when_done = kwargs['when_done']
+        cb = kwargs['cb']
 
         # Create folders if needed
         pathlib.Path(download_folder).mkdir(parents=True, exist_ok=True)
@@ -133,13 +133,15 @@ class F5Downloads:
 
             if self.md5_sum_ok(md5_path, file_path):
                 logger.info('The newest file already exists on disk')
+                return file_path
             else:
                 self.download_file(file_path, url)
                 logger.info(f'Validating {name} against the supplied    md5')
                 if self.md5_sum_ok(md5_path, f'{download_folder}{name}'):
                     logger.info('Downloaded file successfully')
-                    if when_done:
-                        when_done(file_path)
+                    if cb:
+                        cb(file_path)
+                    return(file_path)
                 else:
                     raise Exception(f'Failed to download file {name}')
 
@@ -154,7 +156,6 @@ class F5Downloads:
         file_sum = self.md5(file)
 
         return md5sum == file_sum
-
 
     def md5(self, file_name):
         hash_md5 = hashlib.md5()
@@ -177,8 +178,8 @@ class F5Downloads:
                         f.write(chunk)
 
 
-    def download_geoipdb(self, version, when_done=None):
-        self.follow_path(
+    def download_geoipdb(self, version, cb=None):
+        return self.follow_path(
             self.get_page('https://downloads.f5.com/esd/productlines.jsp'),
             [
                 {
@@ -190,13 +191,13 @@ class F5Downloads:
                 },
                 {
                     'f': self.download_files,
-                    'args': { 'pattern': rf'^ip-geolocation-.+\.zip$', 'download_folder': f'./downloads/GeoIP/v{version}/', 'when_done': when_done}
+                    'args': { 'pattern': rf'^ip-geolocation-.+\.zip$', 'download_folder': f'./downloads/GeoIP/v{version}/', 'cb': cb}
                 }
             ]
         )
 
-    def download_latest_version(self, version):
-        self.follow_path(
+    def download_latest_version(self, version, cb=None ):
+        return self.follow_path(
             self.get_page('https://downloads.f5.com/esd/productlines.jsp'),
             [
                 {
@@ -208,7 +209,7 @@ class F5Downloads:
                 },
                 {
                     'f': self.download_files,
-                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$', 'download_folder': f'./downloads/BIG-IP/v{version}/', 'when_done': when_done}
+                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$', 'download_folder': f'./downloads/BIG-IP/v{version}/', 'cb': cb}
                 }
             ]
         )

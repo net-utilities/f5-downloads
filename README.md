@@ -3,7 +3,8 @@ Make it easy to download things and keep a local repository of F5 software.
 
 ## Usage
 
-1. Copy `rename_to_config.py` to `config.py` and populate it with credentials.
+1. Copy `rename_to_config.py` to `config.py` and populate it with credentials and optionally your devices
+(if you want to) update the geoip databases too.
 2. Example for downloading things
    ```python3
    d = F5Downloads(config['f5_downloads']['username'], config['f5_downloads']['password'])
@@ -33,3 +34,6 @@ To use them you simply need to supply a function as a second parameter.
    # Download the latest GeoIP database and run the my_func in case the download was successful
    d.download_geoipdb(16, my_func)
 ```
+
+## Full example
+Check out `main.py` for a full example that both downloads and updates the geoip database.
