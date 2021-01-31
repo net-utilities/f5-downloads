@@ -1,7 +1,9 @@
 from requests_html import HTMLSession
+from config import *
 import re, logging, os
 import pathlib
 import hashlib
+
 
 logger = logging.getLogger('simple_example')
 logger.setLevel(logging.DEBUG)
@@ -17,7 +19,6 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 
 logger.addHandler(ch)
-
 
 class F5Downloads:
     def __init__(self, username, password, default_location='IRELAND'):
@@ -74,11 +75,13 @@ class F5Downloads:
 
         versionDict = {}
 
-        # This is an ugly one. Threat the versions as a decimal number and return the sum
+        # This is an ugly one. Threat the versions as a decimal number and increase the worth
+        # of each version number by a factor of 10, then return the sum
         for version, url in matching_links:
             number = version.replace('.', '')
             versionDict[number] = (version, url)
 
+        # Pick the highest number
         version, url = versionDict[max(versionDict, key=int)]
         logger.debug(f'Picking {version} as latest version')
 
@@ -110,6 +113,7 @@ class F5Downloads:
         page = kwargs['page']
         pattern = kwargs['pattern']
         download_folder = kwargs['download_folder']
+        when_done = kwargs['when_done']
 
         # Create folders if needed
         pathlib.Path(download_folder).mkdir(parents=True, exist_ok=True)
@@ -118,13 +122,24 @@ class F5Downloads:
 
         for name, url in matching_links:
             md5_name, md5_url = next(iter(self.find_links(page, rf'^{name}.md5$')), (None, None))
-            self.download_file(f'{download_folder}{md5_name}', md5_url)
-            if self.md5_sum_ok(f'{download_folder}{md5_name}', f'{download_folder}{name}'):
+
+            # Only download if there's a matching md5 file
+            if not md5_name:
+                raise Exception(f'No matching md5 file found for {name}')
+
+            file_path = f'{download_folder}{name}'
+            md5_path = f'{download_folder}{md5_name}'
+            self.download_file(md5_path, md5_url)
+
+            if self.md5_sum_ok(md5_path, file_path):
                 logger.info('The newest file already exists on disk')
             else:
-                self.download_file(f'{download_folder}{name}', url)
-                if self.md5_sum_ok(f'{download_folder}{md5_name}', f'{download_folder}{name}'):
+                self.download_file(file_path, url)
+                logger.info(f'Validating {name} against the supplied    md5')
+                if self.md5_sum_ok(md5_path, f'{download_folder}{name}'):
                     logger.info('Downloaded file successfully')
+                    if when_done:
+                        when_done(file_path)
                 else:
                     raise Exception(f'Failed to download file {name}')
 
@@ -162,7 +177,7 @@ class F5Downloads:
                         f.write(chunk)
 
 
-    def download_geoipdb(self, version):
+    def download_geoipdb(self, version, when_done=None):
         self.follow_path(
             self.get_page('https://downloads.f5.com/esd/productlines.jsp'),
             [
@@ -175,7 +190,7 @@ class F5Downloads:
                 },
                 {
                     'f': self.download_files,
-                    'args': {'pattern': rf'^ip-geolocation-.+\.zip$', 'download_folder': f'./downloads/GeoIP/v{version}/'}
+                    'args': { 'pattern': rf'^ip-geolocation-.+\.zip$', 'download_folder': f'./downloads/GeoIP/v{version}/', 'when_done': when_done}
                 }
             ]
         )
@@ -193,12 +208,7 @@ class F5Downloads:
                 },
                 {
                     'f': self.download_files,
-                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$', 'download_folder': f'./downloads/BIG-IP/v{version}/'}
+                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$', 'download_folder': f'./downloads/BIG-IP/v{version}/', 'when_done': when_done}
                 }
             ]
         )
-
-d = F5Downloads('mail@company.com', 'password')
-
-d.download_latest_version(16)
-d.download_geoipdb(16)
