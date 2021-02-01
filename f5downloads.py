@@ -1,9 +1,10 @@
-from requests_html import HTMLSession
-from logger import logger
-
 import re, os
 import pathlib
 import hashlib
+
+from requests_html import HTMLSession
+from logger import logger
+
 
 class F5Downloads:
     def __init__(self, username, password, default_location='IRELAND'):
@@ -35,15 +36,15 @@ class F5Downloads:
 
     def follow_specific_link(self, **kwargs):
         page = kwargs['page']
-        pattern= kwargs['pattern']
+        pattern = kwargs['pattern']
 
         matching_links = self.find_links(page, pattern)
 
         # To proceed in the chain we need exactly one match
         if len(matching_links) != 1:
-            logging.error('Found {len(matching_links)} matches for url {url} and pattern {pattern}, unable to proceed')
-            logging.error('Files found:')
-            logging.error(matching_links)
+            logger.error('Found {len(matching_links)} matches for url {url} and pattern {pattern}, unable to proceed')
+            logger.error('Files found:')
+            logger.error(matching_links)
             raise Exception(f'')
 
         name, url = matching_links[0]
@@ -52,7 +53,7 @@ class F5Downloads:
 
     def pick_latest_version(self, **kwargs):
         page = kwargs['page']
-        pattern= kwargs['pattern']
+        pattern = kwargs['pattern']
 
         matching_links = self.find_links(page, pattern)
 
@@ -77,7 +78,7 @@ class F5Downloads:
 
         step = steps.pop(0)
         f = step['f']
-        args = step['args'] | { 'page': page }
+        args = step['args'] | {'page': page}
 
         result = f(**args)
 
@@ -127,7 +128,7 @@ class F5Downloads:
                     logger.info('Downloaded file successfully')
                     if cb:
                         cb(file_path)
-                    return(file_path)
+                    return (file_path)
                 else:
                     raise Exception(f'Failed to download file {name}')
 
@@ -155,7 +156,7 @@ class F5Downloads:
             os.remove(file_path)
         page = self.get_page(url)
         name, download_url = next(iter(self.find_links(page, rf'{self.default_location}')), (None, None))
-        if(download_url):
+        if (download_url):
             logger.debug(f'Saving file as ./{file_path}')
             with self.session.get(download_url, stream=True) as r:
                 r.raise_for_status()
@@ -163,39 +164,40 @@ class F5Downloads:
                     for chunk in r.iter_content(chunk_size=8192):
                         f.write(chunk)
 
-
     def download_geoipdb(self, version, cb=None):
         return self.follow_path(
             self.get_page('https://downloads.f5.com/esd/productlines.jsp'),
             [
                 {
                     'f': self.follow_specific_link,
-                    'args': { 'pattern': rf'BIG-IP v{version}.x.+' },
+                    'args': {'pattern': rf'BIG-IP v{version}.x.+'},
                 }, {
-                    'f': self.follow_specific_link,
-                    'args': { 'pattern': r'GeoLocationUpdates', }
-                },
+                'f': self.follow_specific_link,
+                'args': {'pattern': r'GeoLocationUpdates', }
+            },
                 {
                     'f': self.download_files,
-                    'args': { 'pattern': rf'^ip-geolocation-.+\.zip$', 'download_folder': f'./downloads/GeoIP/v{version}/', 'cb': cb}
+                    'args': {'pattern': rf'^ip-geolocation-.+\.zip$',
+                             'download_folder': f'./downloads/GeoIP/v{version}/', 'cb': cb}
                 }
             ]
         )
 
-    def download_latest_version(self, version, cb=None ):
+    def download_latest_version(self, version, cb=None):
         return self.follow_path(
             self.get_page('https://downloads.f5.com/esd/productlines.jsp'),
             [
                 {
                     'f': self.follow_specific_link,
-                    'args': { 'pattern': rf'BIG-IP v{version}.x.+' },
+                    'args': {'pattern': rf'BIG-IP v{version}.x.+'},
                 }, {
-                    'f': self.pick_latest_version,
-                    'args': { 'pattern': rf'^{version}[\.0-9]+$', }
-                },
+                'f': self.pick_latest_version,
+                'args': {'pattern': rf'^{version}[\.0-9]+$', }
+            },
                 {
                     'f': self.download_files,
-                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$', 'download_folder': f'./downloads/BIG-IP/v{version}/', 'cb': cb}
+                    'args': {'pattern': rf'^BIGIP-{version}[\.0-9]+.+iso$',
+                             'download_folder': f'./downloads/BIG-IP/v{version}/', 'cb': cb}
                 }
             ]
         )

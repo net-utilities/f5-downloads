@@ -2,7 +2,9 @@ import requests, os, re
 from logger import logger
 
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 
 class F5rest:
     def __init__(self, username, password, device, verify_ssl=True):
@@ -24,7 +26,7 @@ class F5rest:
             token_response = requests.post(
                 f'https://{self.device}/mgmt/shared/authn/login',
                 verify=self.verify_ssl,
-                auth=(self.username, self.password),json=body)\
+                auth=(self.username, self.password), json=body) \
                 .json()
 
             self._token = token_response['token']['token']
@@ -37,7 +39,7 @@ class F5rest:
             'X-F5-Auth-Token': self.token
         }
 
-        chunk_size=512*1024
+        chunk_size = 512 * 1024
         file_obj = open(file_path, 'rb')
         file_name = os.path.basename(file_path)
         size = os.path.getsize(file_path)
@@ -56,9 +58,9 @@ class F5rest:
             else:
                 end = start + current_bytes
 
-            content_range = f'{start}-{end-1}/{size}'
+            content_range = f'{start}-{end - 1}/{size}'
             headers['Content-Range'] = content_range
-            response = requests.post(end_point,
+            requests.post(end_point,
                           data=file_slice,
                           headers=headers,
                           verify=self.verify_ssl)
@@ -75,7 +77,8 @@ class F5rest:
             'utilCmdArgs': f"-c '{command}'"
         }
 
-        response = requests.post('https://' + self.device + '/mgmt/tm/util/bash', json=payload, verify=self.verify_ssl, headers=headers).json()
+        response = requests.post('https://' + self.device + '/mgmt/tm/util/bash', json=payload, verify=self.verify_ssl,
+                                 headers=headers).json()
         if 'commandResult' in response:
             return re.sub('\n$', '', response['commandResult'])
         else:
@@ -87,7 +90,8 @@ class F5rest:
     def get_geoip_db_version(self):
         geoip_db_version = self.run_bash_command('geoip_lookup | egrep -o "[0-9]+$"')
         if not re.match(r'^[0-9]{8}', geoip_db_version):
-            raise Exception('Invalid remote geoip database, run \'geoip_lookup | egrep -o "[0-9]+$"\' and validate the output')
+            raise Exception(
+                'Invalid remote geoip database, run \'geoip_lookup | egrep -o "[0-9]+$"\' and validate the output')
         return geoip_db_version
 
     def get_geoip_db_version_from_file(self, file_name):
