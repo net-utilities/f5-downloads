@@ -1,23 +1,9 @@
 from requests_html import HTMLSession
-import re, logging, os
+from logger import logger
+
+import re, os
 import pathlib
 import hashlib
-
-
-logger = logging.getLogger('simple_example')
-logger.setLevel(logging.DEBUG)
-
-# create console handler and set level to debug
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-
-# create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-# add formatter to ch
-ch.setFormatter(formatter)
-
-logger.addHandler(ch)
 
 class F5Downloads:
     def __init__(self, username, password, default_location='IRELAND'):
