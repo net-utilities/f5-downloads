@@ -114,7 +114,7 @@ class F5rest:
             logger.info('Newest version already exists on the device')
             return False
 
-        if True or not self.test_remote_file('/var/tmp/update_geoipdb.sh'):
+        if not self.test_remote_file('/var/tmp/update_geoipdb.sh'):
             logger.info("Updating the geoip update shell script")
             self.upload_file('./update_geoipdb.sh')
             self.run_bash_command('mv /var/config/rest/downloads/update_geoipdb.sh /var/tmp/')
