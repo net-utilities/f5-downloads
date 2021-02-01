@@ -114,7 +114,7 @@ class F5rest:
 
         if True or not self.test_remote_file('/var/tmp/update_geoipdb.sh'):
             logger.info("Updating the geoip update shell script")
-            self.upload_file('../../update_geoipdb.sh')
+            self.upload_file('./update_geoipdb.sh')
             self.run_bash_command('mv /var/config/rest/downloads/update_geoipdb.sh /var/tmp/')
 
         logger.info(f'Uploading {file_name}')
