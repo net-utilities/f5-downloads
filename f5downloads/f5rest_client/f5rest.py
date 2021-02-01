@@ -80,6 +80,8 @@ class F5rest:
         response = requests.post('https://' + self.device + '/mgmt/tm/util/bash', json=payload, verify=self.verify_ssl,
                                  headers=headers).json()
         if 'commandResult' in response:
+            logger.debug("Command result")
+            logger.debug(response['commandResult'])
             return re.sub('\n$', '', response['commandResult'])
         else:
             return None
