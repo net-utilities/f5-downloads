@@ -3,7 +3,7 @@ import pathlib
 import hashlib
 
 from requests_html import HTMLSession
-from logger import logger
+from f5downloads.logger.logger import logger
 
 
 class F5Downloads:

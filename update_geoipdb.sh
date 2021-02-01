@@ -12,7 +12,7 @@ if [ -f "$UPLOAD_FOLDER/$GEOIP_FILE" ] && [ -f "$UPLOAD_FOLDER/$GEOIP_MD5" ]; th
   mv $UPLOAD_FOLDER/$GEOIP_MD5 $TEMP_FOLDER
 else
   echo "Could not find $UPLOAD_FOLDER/$GEOIP_FILE and $UPLOAD_FOLDER/$GEOIP_MD5"
-  exit 1s
+  exit 1
 fi
 
 cd $TEMP_FOLDER
@@ -21,11 +21,11 @@ cd $TEMP_FOLDER
 if md5sum --status -c $GEOIP_MD5; then
   unzip $GEOIP_FILE
   for filename in *.rpm; do
-      echo "Updating $filename"
       geoip_update_data -f "$filename"
   done
 else
   echo "Invalid md5"
+  exit 1
 fi
 
 if [ -d $TEMP_FOLDER ];then

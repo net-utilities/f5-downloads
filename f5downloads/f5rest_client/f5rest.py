@@ -1,5 +1,5 @@
 import requests, os, re
-from logger import logger
+from f5downloads.logger.logger import logger
 
 import urllib3
 
@@ -84,7 +84,7 @@ class F5rest:
         else:
             return None
 
-    def test_file(self, file_path):
+    def test_remote_file(self, file_path):
         return self.run_bash_command(f'[ -f "{file_path}" ] && echo 1 || echo 0') == '1';
 
     def get_geoip_db_version(self):
@@ -110,11 +110,11 @@ class F5rest:
 
         if local_version == remote_version:
             logger.info('Newest version already exists on the device')
-            return
+            return False
 
-        if True or not self.test_file('/var/tmp/update_geoipdb.sh'):
+        if True or not self.test_remote_file('/var/tmp/update_geoipdb.sh'):
             logger.info("Updating the geoip update shell script")
-            self.upload_file('./update_geoipdb.sh')
+            self.upload_file('../../update_geoipdb.sh')
             self.run_bash_command('mv /var/config/rest/downloads/update_geoipdb.sh /var/tmp/')
 
         logger.info(f'Uploading {file_name}')
@@ -122,3 +122,4 @@ class F5rest:
         self.upload_file(f'{file_path}.md5')
 
         self.run_bash_command(f'bash /var/tmp/update_geoipdb.sh {file_name}')
+        return True
