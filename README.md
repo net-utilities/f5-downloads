@@ -7,7 +7,8 @@ While I've tested this in my own environments I should add that like with all fr
 own risk.
 
 #### Not happy about something? 
-Leave an issue, or better yet, a Pull Request.
+Leave an [issue](https://github.com/net-utilities/f5-downloads/issues), or better yet, a Pull Request. 
+You can also try your luck at our [Discord channel](https://discord.gg/Q2c3UhpJ).
 
 # Configuration
 
