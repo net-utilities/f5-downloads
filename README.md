@@ -23,7 +23,7 @@ Leave an issue, or better yet, a Pull Request.
 | slackWebHook                   | If you want reports on Slack when the job has finished, just add a Webhook URL here.                                                                                     | Yes      | `https://hooks.slack.com/services/AABBCCDD` |
 
 `* The things mentioned as mandatory configuration is only mandatory if you want to update the GeoIP databases using
-main.py
+main.py`
 
 ### A note about the device list
 
@@ -49,7 +49,6 @@ Cronjob or Scheduled tasks.
 6. Run the update script and update the geoip database
 7. Validate that the databases now matches the latest version
 8. Send a slack report if there's any updated databases or if there was an issue with a device 
-
 
 ## Using the packages just for downloading things and keeping a local cache of software
 
