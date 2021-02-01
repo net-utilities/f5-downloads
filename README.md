@@ -38,3 +38,13 @@ d.download_geoipdb(16, my_func)
 
 ## Full example
 Check out `main.py` for a full example that both downloads and updates the geoip database on all devices.
+
+### How it works
+1. Login downloads.f5.com and download the latest geoip database, if needed
+2. For each device it gets a token
+3. Validate that the existing database on the device matches the latest version at downloads.f5.com
+4. If it does, the script exists, if it does not it will move on to the next step
+5. Validate that the update shell script [./update_geoip.sh](./update_geoip.sh) exists in `/var/tmp/`. Upload it if it does not.
+6. Run the update script and update the geoip database
+7. Validate that the databases now matches the latest version
+8. Send a slack report with what was done to the configured webhook
