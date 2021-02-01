@@ -1,5 +1,6 @@
 # Automate F5 downloads
-Make it easy to download things and keep a local repository of F5 software.
+The primary reason for this repository was to update GeoIP databases automatically but it was expanded to make it easy
+to download things and keep a local repository of F5 software.
 
 ## Usage
 
@@ -26,13 +27,13 @@ The download functions supports callback functions to trigger ie. Slack reports 
 To use them you simply need to supply a function as a second parameter.
 
 ```python3
-   def my_func(file_path):
-       print(f'Downloaded {file_path}')
+def my_func(file_path):
+    print(f'Downloaded {file_path}')
 
-   d = F5Downloads(config['f5_downloads']['username'], config['f5_downloads']['password'])
-   
-   # Download the latest GeoIP database and run the my_func in case the download was successful
-   d.download_geoipdb(16, my_func)
+d = F5Downloads(config['f5_downloads']['username'], config['f5_downloads']['password'])
+
+# Download the latest GeoIP database and run the my_func in case the download was successful
+d.download_geoipdb(16, my_func)
 ```
 
 ## Full example
