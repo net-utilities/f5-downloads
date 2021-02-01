@@ -9,5 +9,6 @@ config = {
     },
     'devices': [
         '192.168.70.245'
-    ]
+    ],
+    'slackWebHook': ''
 }
