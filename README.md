@@ -37,4 +37,4 @@ d.download_geoipdb(16, my_func)
 ```
 
 ## Full example
-Check out `main.py` for a full example that both downloads and updates the geoip database.
+Check out `main.py` for a full example that both downloads and updates the geoip database on all devices.

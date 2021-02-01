@@ -124,4 +124,9 @@ class F5rest:
         self.upload_file(f'{file_path}.md5')
 
         self.run_bash_command(f'bash /var/tmp/update_geoipdb.sh {file_name}')
-        return True
+
+        remote_version = self.get_geoip_db_version()
+        if local_version == remote_version:
+            return True
+        else:
+            raise Exception('Failed to update the geoip database using {file_name}')
