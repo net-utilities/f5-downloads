@@ -56,11 +56,14 @@ Cronjob or Scheduled tasks.
 1. Copy `rename_to_config.py` to `config.py` and populate it with credentials and optionally your devices
 2. Example for downloading things
    ```python3
+   from f5downloads import F5Downloads
+   from config import *
+
    d = F5Downloads(config['f5_downloads']['username'], config['f5_downloads']['password'])
-   
+
    # Download the latest v16 version
    d.download_latest_version(16)
-   
+
    # Download the latest GeoIP database
    d.download_geoipdb(16)
    ``` 
