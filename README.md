@@ -12,12 +12,12 @@ You can also try your luck at our [Discord channel](https://discord.gg/Q2c3UhpJ)
 
 # Configuration
 
-| Option                         | Description                                                                                                                                                              | Optional | Sample value                                |
+| Option                         | Description                                                                                                                                                              | Optional | Example value                                |
 |--------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|---------------------------------------------|
 | f5_downloads.username          | This is the mail address you use at https://downloads.f5.com.                                                                                                            | No       | `myemail@company.com`                       |
 | f5_downloads.password          | The password used to login to https://downloads.f5.com.                                                                                                                  | No       | `***********` :)                            |
 | device_credentials.username    | The username used to login to the F5 devices. Admin permissions required if updating GeoIP databases.                                                                    | No*     | `john`                                      |
-| device_credentials.password    | The password used to login to the F5 devices.                                                                                                                            | No*     | ********** :)                               |
+| device_credentials.password    | The password used to login to the F5 devices.                                                                                                                            | No*     | `**********`                               |
 | bigipreport_url                | If you're using [BigIPReport](https://loadbalancing.se/bigipreport-rest/) you can use it as a source for your device list.                                               | Yes      | `https://bigipreport.company.com`           |
 | skip_bigipreport_device_groups | If you're using BigIPreport [BigIPReport](https://loadbalancing.se/bigipreport-rest/) you can skip specific device groups by adding their device group name to this list | Yes      | `['LD-LB']`                                 |
 | explicit_devices               | Add your devices to this array if you're **not** using BigIPReport or want to explicitly add something that is not in BigIPReport.                                       | No*     | `['my-manual-lb.company.com']`              |
@@ -54,8 +54,9 @@ Cronjob or Scheduled tasks.
 ## Using the packages just for downloading things and keeping a local cache of software
 
 1. Copy `rename_to_config.py` to `config.py` and populate it with credentials and optionally your devices
-2. Run the script from the root of the cloned repo
-3. Example for downloading things
+2. Run `pip3 install -r requirements.txt`
+3. Run the script from the root of the cloned repo
+4. Example for downloading things
    ```python3
    from f5downloads import F5Downloads
    from config import *
