@@ -78,7 +78,8 @@ class F5Downloads:
 
         step = steps.pop(0)
         f = step['f']
-        args = step['args'] | {'page': page}
+        args = step['args']
+        args['page'] = page
 
         result = f(**args)
 
