@@ -22,7 +22,7 @@ own risk.
 
 #### Not happy about something? 
 Leave an [issue](https://github.com/net-utilities/f5-downloads/issues), or better yet, a Pull Request. 
-You can also try your luck at our [Discord channel](https://discord.gg/Q2c3UhpJ).
+You can also try your luck at the [BigIPReport Discord channel](https://discord.gg/Q2c3UhpJ).
 
 # Configuration
 
