@@ -54,7 +54,8 @@ Cronjob or Scheduled tasks.
 ## Using the packages just for downloading things and keeping a local cache of software
 
 1. Copy `rename_to_config.py` to `config.py` and populate it with credentials and optionally your devices
-2. Example for downloading things
+2. Run the script from the root of the cloned repo
+3. Example for downloading things
    ```python3
    from f5downloads import F5Downloads
    from config import *
