@@ -2,6 +2,20 @@
 The primary reason for this repository was to update GeoIP databases automatically but it was expanded to make it easy
 to download things and keep a local repository of F5 software.
 
+## How it works
+A more verbose article about the repository can be found here: [https://loadbalancing.se/2021/02/04/automating-f5-geoip-updates/](https://loadbalancing.se/2021/02/04/automating-f5-geoip-updates/).
+
+### TLDR;
+1. Login downloads.f5.com and download the latest geoip database, if needed
+2. Generates a device list according to the logic above and then for each device it gets a token and does the following
+   steps
+3. Validate that the existing database on the device matches the latest version at downloads.f5.com
+4. If it does, the script exists, if it does not it will move on to the next step
+5. Validate that the update shell script [./update_geoip.sh](./update_geoip.sh) exists in `/var/tmp/`. Upload it if it does not.
+6. Run the update script and update the geoip database
+7. Validate that the databases now matches the latest version
+8. Send a slack report if there's any updated databases or if there was an issue with a device 
+
 #### Disclaimer
 While I've tested this in my own environments I should add that like with all free software you're running this on your
 own risk.
@@ -39,17 +53,6 @@ device IPs/DNSs manually to `explicit_devices`.
 # Running the script
 When you have configured the script you can run `main.py` to start it. Schedule it according to your liking using a
 Cronjob or Scheduled tasks.
-
-## How it works
-1. Login downloads.f5.com and download the latest geoip database, if needed
-2. Generates a device list according to the logic above and then for each device it gets a token and does the following
-   steps
-3. Validate that the existing database on the device matches the latest version at downloads.f5.com
-4. If it does, the script exists, if it does not it will move on to the next step
-5. Validate that the update shell script [./update_geoip.sh](./update_geoip.sh) exists in `/var/tmp/`. Upload it if it does not.
-6. Run the update script and update the geoip database
-7. Validate that the databases now matches the latest version
-8. Send a slack report if there's any updated databases or if there was an issue with a device 
 
 ## Using the packages just for downloading things and keeping a local cache of software
 
